@@ -2,6 +2,11 @@ Build:
 
     $ mvn clean verify
     $ ./run.sh
+    
+Docker:
+
+    $ mvn clean verify -P docker
+    $ docker run -d --rm --name my-rat -p 8080:8080 -e MY_CALLER="Running in Docker" ratpack-demo-service:latest
 
 Usage:
 

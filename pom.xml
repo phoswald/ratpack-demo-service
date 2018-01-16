@@ -47,12 +47,57 @@
             </goals>
             <configuration>
               <includeScope>runtime</includeScope>
-              <outputDirectory>target/libs</outputDirectory>
+              <outputDirectory>target/lib</outputDirectory>
             </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.23.0</version>
+            <executions>
+              <execution>
+                <id>docker-build</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <images>
+                <image>
+                  <name>${project.artifactId}</name>
+                  <alias>dockerfile</alias>
+                  <build>
+                    <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                    <assembly>
+                      <inline>
+                        <fileSets>
+                          <fileSet>
+                            <directory>target</directory>
+                            <outputDirectory>.</outputDirectory>
+                          </fileSet>
+                        </fileSets>
+                      </inline>
+                    </assembly>
+                  </build>
+                </image>
+              </images>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
