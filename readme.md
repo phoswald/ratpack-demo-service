@@ -24,6 +24,7 @@ Usage:
     $ curl http://localhost:8080/mem
     $ curl http://localhost:8080/mem/foo
     $ curl http://localhost:8080/mem/foo?value=bar -X PUT
+    $ curl http://localhost:8080/file?path=/etc/hostname
     $ curl http://localhost:8080/session
     $ curl http://localhost:8080/session?logout
     $ curl http://localhost:8080/log?message=hello -X POST

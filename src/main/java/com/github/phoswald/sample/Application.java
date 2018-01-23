@@ -1,5 +1,9 @@
 package com.github.phoswald.sample;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -7,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
@@ -40,6 +45,7 @@ public class Application {
                                 .put(ctx -> storeMapEntry(ctx, map, ctx.getPathTokens().get("key"), ctx.getRequest().getQueryParams().get("value")))
                                 .get(ctx -> printMapEntry(ctx, map, ctx.getPathTokens().get("key")))
                         ))
+                        .get("file", ctx -> printFile(ctx, Paths.get(Optional.ofNullable(ctx.getRequest().getQueryParams().get("path")).orElse("/"))))
                         .get("session", ctx -> handleSession(ctx, ctx.getRequest().getQueryParams().get("logout") != null))
                         .post("log", ctx -> { logger.info(Optional.ofNullable(ctx.getRequest().getQueryParams().get("message"))); ctx.render("OK\n"); })
                         .post("exit", ctx -> System.exit(1))));
@@ -70,7 +76,7 @@ public class Application {
         StringBuilder sb = new StringBuilder();
         map.entrySet().stream()
                 .sorted(Comparator.comparing(e -> (String) e.getKey()))
-                .forEach(e -> sb.append(e.getKey() + "=" + e.getValue() + "\n"));
+                .forEach(e -> sb.append(e.getKey() + "=" + e.getValue().toString().replace('\n', '|') + "\n"));
         if (sb.length() == 0) {
             sb.append("<empty>\n");
         }
@@ -90,6 +96,27 @@ public class Application {
             map.remove(key);
         }
         ctx.render("OK\n");
+    }
+
+    private static void printFile(Context ctx, Path path) {
+        try {
+            if(Files.isRegularFile(path)) {
+                ctx.getResponse().sendFile(path);
+            } else if(Files.isDirectory(path)) {
+                String content = Files.list(path)
+                        .map(p -> p.getFileName().toString() + (Files.isDirectory(p) ? "/" : ""))
+                        .sorted()
+                        .collect(Collectors.joining("\n", "", "\n"));
+                ctx.render(content);
+            } else {
+                ctx.getResponse().status(404);
+                ctx.render("");
+            }
+        } catch (IOException e) {
+            logger.error("Unexpected trouble", e);
+            ctx.getResponse().status(500);
+            ctx.render("");
+        }
     }
 
     private static void handleSession(Context ctx, boolean logout) {
