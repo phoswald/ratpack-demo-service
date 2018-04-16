@@ -47,7 +47,7 @@ public class Application {
                         ))
                         .get("file", ctx -> printFile(ctx, Paths.get(Optional.ofNullable(ctx.getRequest().getQueryParams().get("path")).orElse("/"))))
                         .get("session", ctx -> handleSession(ctx, ctx.getRequest().getQueryParams().get("logout") != null))
-                        .post("log", ctx -> { logger.info(Optional.ofNullable(ctx.getRequest().getQueryParams().get("message"))); ctx.render("OK\n"); })
+                        .get("log", ctx -> { String message = Optional.ofNullable(ctx.getRequest().getQueryParams().get("message")).orElse("???"); logger.info("Message = " + message); ctx.render(message + "\n"); })
                         .post("exit", ctx -> System.exit(1))));
     }
 

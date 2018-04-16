@@ -27,5 +27,5 @@ Usage:
     $ curl http://localhost:8080/file?path=/etc/hostname
     $ curl http://localhost:8080/session
     $ curl http://localhost:8080/session?logout
-    $ curl http://localhost:8080/log?message=hello -X POST
+    $ curl http://localhost:8080/log?message=hello
     $ curl http://localhost:8080/exit -X POST
