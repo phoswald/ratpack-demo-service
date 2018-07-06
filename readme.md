@@ -1,31 +1,19 @@
-Build:
-
-    $ mvn clean verify
-    $ ./run.sh
-    
-Docker:
+# Run Standalone 
 
     $ mvn clean verify -P docker
-    $ docker run -d --rm --name my-rat -p 8080:8080 -e MY_CALLER="Running in Docker" ratpack-demo-service:latest
+    $ cd target/docker/ratpack-demo-service/build/maven
+    $ java -cp "./*" com.github.phoswald.ratpack.demo.service.Application
 
-Usage:
+# Run with Docker 
+
+    $ mvn clean verify -P docker
+    $ docker run -it --rm -p 8080:8080 -e FOO=BAR ratpack-demo-service:1.0.0-SNAPSHOT
+
+# URLs
 
     $ curl http://localhost:8080/
-    $ curl http://localhost:8080/health
+    $ curl http://localhost:8080/about
     $ curl http://localhost:8080/now
-    $ curl http://localhost:8080/req?foo=bar
-    $ curl http://localhost:8080/greet
-    $ curl http://localhost:8080/greet?name=Philip
-    $ curl http://localhost:8080/args
-    $ curl http://localhost:8080/env
-    $ curl http://localhost:8080/env/PATH
-    $ curl http://localhost:8080/prop
-    $ curl http://localhost:8080/prop/os.name
-    $ curl http://localhost:8080/mem
-    $ curl http://localhost:8080/mem/foo
     $ curl http://localhost:8080/mem/foo?value=bar -X PUT
-    $ curl http://localhost:8080/file?path=/etc/hostname
-    $ curl http://localhost:8080/session
-    $ curl http://localhost:8080/session?logout
-    $ curl http://localhost:8080/log?message=hello
+    $ curl http://localhost:8080/log?message=hello -X POST
     $ curl http://localhost:8080/exit -X POST

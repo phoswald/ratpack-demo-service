@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -15,15 +16,15 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.ratpack</groupId>
-      <artifactId>ratpack-core</artifactId>
-      <version>1.5.1</version>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.25</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.ratpack</groupId>
+      <artifactId>ratpack-core</artifactId>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
@@ -33,24 +34,17 @@
   </dependencies>
 
   <build>
-    <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-libs</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeScope>runtime</includeScope>
-              <outputDirectory>target/lib</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -63,7 +57,7 @@
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.23.0</version>
+            <version>0.25.2</version>
             <executions>
               <execution>
                 <id>docker-build</id>
@@ -76,18 +70,14 @@
             <configuration>
               <images>
                 <image>
-                  <name>${project.artifactId}</name>
-                  <alias>dockerfile</alias>
+                  <name>${project.artifactId}:${project.version}</name>
                   <build>
-                    <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                    <dockerFile>Dockerfile</dockerFile>
                     <assembly>
                       <inline>
-                        <fileSets>
-                          <fileSet>
-                            <directory>target</directory>
-                            <outputDirectory>.</outputDirectory>
-                          </fileSet>
-                        </fileSets>
+                        <dependencySets>
+                          <dependencySet/>
+                        </dependencySets>
                       </inline>
                     </assembly>
                   </build>

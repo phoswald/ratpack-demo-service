@@ -1,16 +1,21 @@
-package com.github.phoswald.sample;
+package com.github.phoswald.ratpack.demo.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -30,9 +35,13 @@ public class Application {
         RatpackServer.start(server -> server
                 .serverConfig(c -> c.port(8080))
                 .handlers(chain -> chain
-                        .get(ctx -> ctx.render("This is ratpack-demo-service, a simple and cool HTTP server\n"))
+                        .get(ctx -> printResource(ctx, "/index.html", "text/html"))
                         .get("health", ctx -> ctx.render("OK\n"))
-                        .get("now", ctx -> ctx.render(ZonedDateTime.now().toString() + "\n"))
+                        .get("about", ctx -> ctx.render(Application.class.getPackage().getName() + " " + Application.class.getPackage().getImplementationVersion() + "\n"))
+                        .get("now", ctx -> ctx.render(ZonedDateTime.now() + "\n"))
+                        .get("locnow", ctx -> ctx.render(LocalDateTime.now() + "\n"))
+                        .get("locale", ctx -> ctx.render(Locale.getDefault() + "\n"))
+                        .get("tz", ctx -> ctx.render(TimeZone.getDefault().getID() + "\n"))
                         .get("req", ctx -> printRequest(ctx))
                         .get("greet", ctx -> ctx.render("Hello, " + Optional.ofNullable(ctx.getRequest().getQueryParams().get("name")).orElse("Stranger") + "!\n"))
                         .get("args", ctx -> ctx.render(Arrays.asList(args).toString() + "\n"))
@@ -47,7 +56,7 @@ public class Application {
                         ))
                         .get("file", ctx -> printFile(ctx, Paths.get(Optional.ofNullable(ctx.getRequest().getQueryParams().get("path")).orElse("/"))))
                         .get("session", ctx -> handleSession(ctx, ctx.getRequest().getQueryParams().get("logout") != null))
-                        .get("log", ctx -> { String message = Optional.ofNullable(ctx.getRequest().getQueryParams().get("message")).orElse("???"); logger.info("Message = " + message); ctx.render(message + "\n"); })
+                        .post("log", ctx -> { logger.info(Optional.ofNullable(ctx.getRequest().getQueryParams().get("message"))); ctx.render("OK\n"); })
                         .post("exit", ctx -> System.exit(1))));
     }
 
@@ -96,6 +105,21 @@ public class Application {
             map.remove(key);
         }
         ctx.render("OK\n");
+    }
+
+    private static void printResource(Context ctx, String name, String contentType) {
+       try(InputStream stm = Application.class.getResourceAsStream(name)) {
+          ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+          int current;
+          while((current = stm.read()) != -1) {
+             bytes.write(current);
+          }
+          ctx.getResponse().send(contentType, bytes.toByteArray());
+       } catch (IOException e) {
+          logger.error("Unexpected trouble", e);
+          ctx.getResponse().status(500);
+          ctx.render("");
+      }
     }
 
     private static void printFile(Context ctx, Path path) {
