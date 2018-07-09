@@ -68,6 +68,8 @@
               </execution>
             </executions>
             <configuration>
+              <verbose>true</verbose>
+              <imagePullPolicy>Always</imagePullPolicy>
               <images>
                 <image>
                   <name>${project.artifactId}:${project.version}</name>
