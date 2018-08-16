@@ -3,6 +3,7 @@ package com.github.phoswald.ratpack.demo.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,7 +42,8 @@ public class Application {
                         .get("now", ctx -> ctx.render(ZonedDateTime.now() + "\n"))
                         .get("locnow", ctx -> ctx.render(LocalDateTime.now() + "\n"))
                         .get("locale", ctx -> ctx.render(Locale.getDefault() + "\n"))
-                        .get("tz", ctx -> ctx.render(TimeZone.getDefault().getID() + "\n"))
+                        .get("timezone", ctx -> ctx.render(TimeZone.getDefault().getID() + "\n"))
+                        .get("charset", ctx -> ctx.render(Charset.defaultCharset().name() + "\n"))
                         .get("req", ctx -> printRequest(ctx))
                         .get("greet", ctx -> ctx.render("Hello, " + Optional.ofNullable(ctx.getRequest().getQueryParams().get("name")).orElse("Stranger") + "!\n"))
                         .get("args", ctx -> ctx.render(Arrays.asList(args).toString() + "\n"))
