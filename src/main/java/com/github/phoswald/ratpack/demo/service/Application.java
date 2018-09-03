@@ -51,6 +51,7 @@ public class Application {
                         .get("env/:name", ctx -> printMapEntry(ctx, System.getenv(), ctx.getPathTokens().get("name")))
                         .get("prop", ctx -> printMap(ctx, System.getProperties()))
                         .get("prop/:name", ctx -> printMapEntry(ctx, System.getProperties(), ctx.getPathTokens().get("name")))
+                        .get("heap", ctx -> printHeap(ctx))
                         .get("mem", ctx -> printMap(ctx, map))
                         .path("mem/:key", ctx2 -> ctx2.byMethod(chain2 -> chain2
                                 .put(ctx -> storeMapEntry(ctx, map, ctx.getPathTokens().get("key"), ctx.getRequest().getQueryParams().get("value")))
@@ -122,6 +123,15 @@ public class Application {
           ctx.getResponse().status(500);
           ctx.render("");
       }
+    }
+
+    private static void printHeap(Context ctx) {
+        StringBuilder sb = new StringBuilder();
+        Runtime rt = Runtime.getRuntime();
+        sb.append("max:   at most   " + (rt.maxMemory() == Long.MAX_VALUE ? "(unlimited)\n" : ((rt.maxMemory() >> 20) + " MB\n")));
+        sb.append("total: currently " + (rt.totalMemory() >> 20) + " MB\n");
+        sb.append("free:  currently " + (rt.freeMemory() >> 20) + " MB\n");
+        ctx.render(sb.toString());
     }
 
     private static void printFile(Context ctx, Path path) {
