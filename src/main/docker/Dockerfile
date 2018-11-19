@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-alpine
+FROM gcr.io/distroless/java:latest
 
 COPY maven /usr/local/application/
 
@@ -6,4 +6,6 @@ EXPOSE 8080
 
 WORKDIR /usr/local/application
 
-CMD java -cp "./*" com.github.phoswald.ratpack.demo.service.Application
+ENTRYPOINT []
+
+CMD ["/usr/bin/java", "-cp", "./*", "com.github.phoswald.ratpack.demo.service.Application"]
