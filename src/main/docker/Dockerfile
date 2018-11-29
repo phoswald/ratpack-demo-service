@@ -40,6 +40,9 @@ ENV LC_ALL            de_CH.UTF-8
 ENV PATH              /usr/local/jre/bin
 ENV JAVA_TOOL_OPTIONS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=2 -Dcaller=Docker
 
+# Define user/group (optional)
+USER 1001:1001
+
 # Copy application and define command
 WORKDIR /usr/local/application/
 EXPOSE 8080
