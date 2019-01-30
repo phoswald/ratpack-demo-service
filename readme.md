@@ -11,9 +11,12 @@
 
 # URLs
 
-    $ curl http://localhost:8080/
-    $ curl http://localhost:8080/about
-    $ curl http://localhost:8080/now
-    $ curl http://localhost:8080/mem/foo?value=bar -X PUT
-    $ curl http://localhost:8080/log?message=hello -X POST
-    $ curl http://localhost:8080/exit -X POST
+    $ curl "http://localhost:8080/"
+    $ curl "http://localhost:8080/about"
+    $ curl "http://localhost:8080/now"
+    $ curl "http://localhost:8080/mem"
+    $ curl "http://localhost:8080/mem/foo?value=bar" -X PUT
+    $ curl "http://localhost:8080/file?path=/tmp/message.txt"
+    $ curl "http://localhost:8080/file?path=/tmp/message.txt&content=hello" -X PUT
+    $ curl "http://localhost:8080/log?message=hello" -X POST
+    $ curl "http://localhost:8080/exit" -X POST

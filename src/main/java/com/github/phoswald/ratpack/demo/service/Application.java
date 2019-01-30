@@ -54,10 +54,13 @@ public class Application {
                         .get("heap", ctx -> printHeap(ctx))
                         .get("mem", ctx -> printMap(ctx, map))
                         .path("mem/:key", ctx2 -> ctx2.byMethod(chain2 -> chain2
-                                .put(ctx -> storeMapEntry(ctx, map, ctx.getPathTokens().get("key"), ctx.getRequest().getQueryParams().get("value")))
                                 .get(ctx -> printMapEntry(ctx, map, ctx.getPathTokens().get("key")))
+                                .put(ctx -> storeMapEntry(ctx, map, ctx.getPathTokens().get("key"), ctx.getRequest().getQueryParams().get("value")))
                         ))
-                        .get("file", ctx -> printFile(ctx, Paths.get(Optional.ofNullable(ctx.getRequest().getQueryParams().get("path")).orElse("/"))))
+                        .path("file", ctx2 -> ctx2.byMethod(chain2 -> chain2
+                                .get(ctx -> printFile(ctx, Paths.get(Optional.ofNullable(ctx.getRequest().getQueryParams().get("path")).orElse("/"))))
+                                .put(ctx -> storeFile(ctx, Paths.get(Optional.ofNullable(ctx.getRequest().getQueryParams().get("path")).orElse("/")), ctx.getRequest().getQueryParams().get("content")))
+                        ))
                         .get("session", ctx -> handleSession(ctx, ctx.getRequest().getQueryParams().get("logout") != null))
                         .post("log", ctx -> { logger.info(Optional.ofNullable(ctx.getRequest().getQueryParams().get("message"))); ctx.render("OK\n"); })
                         .post("exit", ctx -> System.exit(1))));
@@ -137,6 +140,7 @@ public class Application {
     private static void printFile(Context ctx, Path path) {
         try {
             if(Files.isRegularFile(path)) {
+        		logger.info("Printing " + path);
                 ctx.getResponse().sendFile(path);
             } else if(Files.isDirectory(path)) {
                 String content = Files.list(path)
@@ -153,6 +157,19 @@ public class Application {
             ctx.getResponse().status(500);
             ctx.render("");
         }
+    }
+
+    private static void storeFile(Context ctx, Path path, String content) {
+    	try {
+    		logger.info("Storing " + path + ": " + content);
+	    	Files.createDirectories(path.getParent());
+	    	Files.write(path, Arrays.asList(content));
+            ctx.render("OK\n");
+    	} catch (IOException e) {
+            logger.error("Unexpected trouble", e);
+            ctx.getResponse().status(500);
+            ctx.render("");
+		}
     }
 
     private static void handleSession(Context ctx, boolean logout) {
