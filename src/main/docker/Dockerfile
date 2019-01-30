@@ -1,9 +1,15 @@
 FROM openjdk:8-jre-alpine
 
-COPY maven /usr/local/application/
+ENV TZ                Europe/Zurich
+ENV LANG              de_CH.UTF-8
+ENV LC_ALL            de_CH.UTF-8
+ENV JAVA_TOOL_OPTIONS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=2 -Dcaller=Docker
 
+# Define user/group (optional)
+USER daemon:daemon
+
+# Copy application and define command
+WORKDIR /usr/local/application/
 EXPOSE 8080
-
-WORKDIR /usr/local/application
-
-CMD java -cp "./*" com.github.phoswald.ratpack.demo.service.Application
+COPY maven .
+CMD ["java", "-cp", "./*", "com.github.phoswald.ratpack.demo.service.Application"]
