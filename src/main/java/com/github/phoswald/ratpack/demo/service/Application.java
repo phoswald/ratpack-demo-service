@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import ratpack.handling.Context;
@@ -62,7 +63,7 @@ public class Application {
                                 .put(ctx -> storeFile(ctx, Paths.get(Optional.ofNullable(ctx.getRequest().getQueryParams().get("path")).orElse("/")), ctx.getRequest().getQueryParams().get("content")))
                         ))
                         .get("session", ctx -> handleSession(ctx, ctx.getRequest().getQueryParams().get("logout") != null))
-                        .post("log", ctx -> { logger.info(Optional.ofNullable(ctx.getRequest().getQueryParams().get("message"))); ctx.render("OK\n"); })
+                        .get("log", ctx -> log(ctx, ctx.getRequest().getQueryParams().get("message"), ctx.getRequest().getQueryParams().get("level"), ctx.getRequest().getQueryParams().get("logger")))
                         .post("exit", ctx -> System.exit(1))));
     }
 
@@ -184,5 +185,12 @@ public class Application {
             }
             ctx.render("Session: " + cookie + "\n");
         }
+    }
+    
+    private static void log(Context ctx, String message, String levelName, String loggerName) {
+    	Logger instance = (loggerName != null) ? Logger.getLogger(loggerName) : logger;
+    	Level level = (levelName != null) ? Level.toLevel(levelName) : Level.INFO;
+    	instance.log(level, (message != null) ? message : "some log message");
+    	ctx.render("OK\n");
     }
 }
