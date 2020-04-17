@@ -1,13 +1,12 @@
 # Run Standalone 
 
-    $ mvn clean verify -P docker
-    $ cd target/docker/ratpack-demo-service/build/maven
-    $ java -cp "./*" com.github.phoswald.ratpack.demo.service.Application
+    $ mvn clean verify
+    $ java -cp 'target/*:target/lib/*' com.github.phoswald.ratpack.demo.service.Application
 
 # Run with Docker 
 
     $ mvn clean verify -P docker
-    $ docker run -it --rm -p 8080:8080 -e FOO=BAR ratpack-demo-service:1.0.0-SNAPSHOT
+    $ docker run -it --rm -p 8080:8080 ratpack-demo-service:1.0.0-SNAPSHOT
 
 # URLs
 
